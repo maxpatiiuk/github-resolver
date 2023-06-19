@@ -19,8 +19,8 @@ Install dependencies:
 npm install
 ```
 
-Add this to your shell init file. Change the "path" variable to the location of
-current folder
+Add this to your shell init file. Change the "dir" variable to the directory
+in which this repository is located.
 
 ```sh
 g() {
