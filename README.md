@@ -89,8 +89,9 @@ variable to the command you want to run instead
 For example:
 
 ```sh
-# In init file:
+# In the init file:
 export LIST_FILES="ls -ahl"
+
 # Later:
 g https://github.com/specify/specify7/tree/production/
 ```
@@ -100,6 +101,18 @@ And this will open the `README.md` file in your editor:
 ```sh
 g https://github.com/specify/specify7/blob/production/README.md
 ```
+
+You can customize the used editor by setting an `EDITOR` environment variable:
+```sh
+# In the init file:
+export EDITOR="vim"
+
+# Later:
+g https://github.com/specify/specify7/tree/production/
+```
+
+By default it would use system's default editor associated with the file
+extension of the file you are trying to open.
 
 > Note, this script would not change the current branch as that could lead to
 > loss of uncommitted changes
