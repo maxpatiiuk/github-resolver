@@ -18,9 +18,10 @@
       "es2021",
       "esnext"
     ],
-    "module": "module",
-    "noEmit": true,
-    "sourceMap": true,
+    "module": "esnext",
+    "noEmit": false,
+    "outDir": "./dist/",
+    "sourceMap": false,
     "target": "esnext",
     "allowJs": false,
     "checkJs": false,

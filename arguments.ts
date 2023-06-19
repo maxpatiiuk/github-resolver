@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-import { getBranches, getCurrentBranch, getRemotes } from './helpers';
+import { getBranches, getCurrentBranch, getRemotes } from './helpers.js';
 
 const booleanDefinitions = ['dry'];
 const valuedDefinitions = [
@@ -38,7 +38,8 @@ export function parseArguments(args = process.argv.slice(2)): Arguments {
       const resolved = resolve(parsed);
 
       if (typeof resolved === 'string') {
-        pendingArgument = resolved;
+        if (booleanDefinitions.includes(resolved)) values[resolved] = 'true';
+        else pendingArgument = resolved;
         return;
       }
 
@@ -57,14 +58,7 @@ export function parseArguments(args = process.argv.slice(2)): Arguments {
 
       console.warn(`Unknown argument: ${argument}`);
     } else if (typeof pendingArgument === 'string') {
-      const value = argument.trim();
-      const isBoolean = booleanDefinitions.includes(pendingArgument);
-      values[pendingArgument] = isBoolean
-        ? !value.toLowerCase().startsWith('f') &&
-          !value.toLowerCase().startsWith('n')
-          ? 'true'
-          : 'false'
-        : value;
+      values[pendingArgument] = argument.trim();
       pendingArgument = undefined;
     } else unresolved.push(argument.trim());
   });

@@ -1,4 +1,4 @@
-import { unique } from '../utils';
+import { unique } from '../utils.js';
 
 describe('unique', () => {
   test('empty array', () => expect(unique([])).toEqual([]));

@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
-import { unique } from './utils';
+import { unique } from './utils.js';
 
 const exec = (command: string): RA<string> =>
   execSync(command).toString().trim().split('\n');

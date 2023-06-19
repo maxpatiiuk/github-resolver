@@ -5,7 +5,7 @@ import {
   getRemotes,
   getRemoteUrl,
   getRootDirectory,
-} from '../helpers';
+} from '../helpers.js';
 
 test('getGitDirectory', () =>
   expect(getGitDirectory()).toBe(`${process.cwd()}/.git`));
