@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import { reverseUrl } from '../reverseUrl';
+import { reverseUrl } from '../reverseUrl.js';
 
 describe('reverseUrl', () => {
   test('invalid url', () =>

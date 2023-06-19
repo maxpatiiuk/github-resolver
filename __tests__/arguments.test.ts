@@ -1,5 +1,5 @@
-import type { Arguments } from '../arguments';
-import { parseArguments } from '../arguments';
+import type { Arguments } from '../arguments.js';
+import { parseArguments } from '../arguments.js';
 
 const runs: IR<Arguments & { readonly warning?: string }> = {
   '': {
@@ -16,9 +16,9 @@ const runs: IR<Arguments & { readonly warning?: string }> = {
     remote: 'origin',
     url: undefined,
   },
-  '--file=file.txt main2': {
+  '--file=file.txt main2 --dry': {
     branch: 'main2',
-    dry: 'false',
+    dry: 'true',
     file: 'file.txt',
     remote: 'origin',
     url: undefined,
@@ -30,9 +30,9 @@ const runs: IR<Arguments & { readonly warning?: string }> = {
     remote: 'origin',
     url: undefined,
   },
-  '-fdir/file.txt -bp.': {
+  '-fdir/file.txt --dry=true -bp.': {
     branch: 'pass',
-    dry: 'false',
+    dry: 'true',
     file: 'dir/file.txt',
     remote: 'origin',
     url: undefined,
@@ -52,9 +52,9 @@ const runs: IR<Arguments & { readonly warning?: string }> = {
     remote: 'origin',
     url: 'https://github.com/example/example/example',
   },
-  'github.com/example/example/example': {
+  '--dry github.com/example/example/example': {
     branch: 'main',
-    dry: 'false',
+    dry: 'true',
     file: './',
     remote: 'origin',
     url: 'github.com/example/example/example',

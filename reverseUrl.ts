@@ -2,7 +2,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { URL } from 'node:url';
 
-import { getRootDirectory } from './helpers';
+import { getRootDirectory } from './helpers.js';
 
 const reGitHubUrl =
   /\/(?<organization>[^/]+)\/(?<repository>[^/]+)\/?(?:(?<type>tree|blob)\/(?<branch>[^/]+\/?(?<path>.*)))?/u;

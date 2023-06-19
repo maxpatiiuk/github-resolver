@@ -1,7 +1,7 @@
 import path from 'node:path';
 
-import type { Arguments } from './arguments';
-import { getRemoteUrl, getRootDirectory } from './helpers';
+import type { Arguments } from './arguments.js';
+import { getRemoteUrl, getRootDirectory } from './helpers.js';
 
 /**
  * Construct a GitHub folder/file view url based on the path

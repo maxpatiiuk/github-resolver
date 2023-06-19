@@ -1,6 +1,8 @@
-import { parseArguments } from './arguments';
-import { buildUrl } from './buildUrl';
-import { reverseUrl } from './reverseUrl';
+import open from 'open';
+
+import { parseArguments } from './arguments.js';
+import { buildUrl } from './buildUrl.js';
+import { reverseUrl } from './reverseUrl.js';
 
 const parsed = parseArguments();
 const dry = parsed.dry === 'true';
@@ -10,5 +12,5 @@ if (typeof parsed.url === 'string')
 else {
   const url = buildUrl(parsed);
   if (dry) console.log(url);
-  else window.open(url);
+  else open(url).catch(console.error);
 }
