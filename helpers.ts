@@ -4,7 +4,7 @@ import path from 'node:path';
 import { unique } from './utils.js';
 
 const exec = (command: string): RA<string> =>
-  execSync(command).toString().trim().split('\n');
+  execSync(command).toString().trim().split('\n').filter(Boolean);
 
 export const getGitDirectory = (): string => exec('git rev-parse --git-dir')[0];
 
