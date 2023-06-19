@@ -1,0 +1,166 @@
+import fs from 'node:fs';
+
+import { getBranches, getCurrentBranch, getRemotes } from './helpers';
+
+const booleanDefinitions = ['dry'];
+const valuedDefinitions = [
+  'file',
+  'branch',
+  'remote',
+  'url',
+  ...booleanDefinitions,
+];
+type Argument = ItemOf<typeof valuedDefinitions>;
+type MutableArguments = Record<Argument, string | undefined>;
+export type Arguments = Readonly<MutableArguments>;
+
+/**
+ * Very forgiving and flexible argument parsing
+ * Allows for `--file=path -branch branch -remote remoteName -f path --f=path`
+ * Or even: `file branch remoteName` in any order and it will automatically try
+ * to figure out which argument is what)
+ */
+export function parseArguments(args = process.argv.slice(2)): Arguments {
+  const values: MutableArguments = Object.fromEntries(
+    valuedDefinitions.map((key) => [key, undefined])
+  );
+  const unresolved: WritableArray<string> = [];
+  let pendingArgument: Argument | undefined = undefined;
+  args.forEach((argument) => {
+    if (argument.startsWith('-')) {
+      if (
+        typeof pendingArgument === 'string' &&
+        booleanDefinitions.includes(pendingArgument)
+      )
+        values[pendingArgument] = 'true';
+
+      const parsed = argument.replaceAll(/^-+/gmu, '');
+      const resolved = resolve(parsed);
+
+      if (typeof resolved === 'string') {
+        pendingArgument = resolved;
+        return;
+      }
+
+      const [name, ...parts] = parsed.split('=');
+      const nameArgument = resolve(name);
+      if (typeof nameArgument === 'string') {
+        values[nameArgument] = parts.join('=').trim();
+        return;
+      }
+
+      const shortArgument = resolve(parsed[0]);
+      if (typeof shortArgument === 'string') {
+        values[shortArgument] = parsed.slice(1).trim();
+        return;
+      }
+
+      console.warn(`Unknown argument: ${argument}`);
+    } else if (typeof pendingArgument === 'string') {
+      const value = argument.trim();
+      const isBoolean = booleanDefinitions.includes(pendingArgument);
+      values[pendingArgument] = isBoolean
+        ? !value.toLowerCase().startsWith('f') &&
+          !value.toLowerCase().startsWith('n')
+          ? 'true'
+          : 'false'
+        : value;
+      pendingArgument = undefined;
+    } else unresolved.push(argument.trim());
+  });
+
+  if (typeof pendingArgument === 'string')
+    console.warn(`Argument without value: ${pendingArgument}`);
+
+  const parsed = applyDefaults(unresolved.reduce(resolveArgument, values));
+  return {
+    ...parsed,
+    branch: resolveBranch(parsed.branch),
+  };
+}
+
+const resolve = (value: string): Argument | undefined =>
+  valuedDefinitions.find((known) => known.startsWith(value));
+
+/**
+ * Support resolving arguments even argument name is not explicitly provided
+ */
+function resolveArgument(args: Arguments, unresolved: string): Arguments {
+  const lower = unresolved.toLowerCase();
+
+  // Check if argument is a url
+  if (
+    args.url === undefined &&
+    ['https://', 'http://', 'www.', 'github.com'].some((part) =>
+      lower.startsWith(part)
+    )
+  )
+    return { ...args, url: unresolved };
+
+  // Check if arguments matches a file that exists
+  if (args.file === undefined && fs.existsSync(unresolved))
+    return { ...args, file: unresolved };
+
+  // Check if argument matches a branch
+  if (args.branch === undefined) {
+    const branches = getBranches();
+    const branch = branches.find((branch) => branch.toLowerCase() === lower);
+    if (typeof branch === 'string') return { ...args, branch };
+    // See resolveBranch()
+    else if (unresolved.endsWith('.')) return { ...args, branch: unresolved };
+  }
+
+  // Check if argument matches a remote
+  if (args.remote === undefined) {
+    const remotes = getRemotes();
+    const remote = remotes.find((remote) => remote.toLowerCase() === lower);
+    if (typeof remote === 'string') return { ...args, remote };
+  }
+
+  // Assume it's just a file that doesn't exist locally
+  if (args.file === undefined && unresolved.includes('.'))
+    return { ...args, file: unresolved };
+
+  // If not found branch yet, assume this is branch name
+  if (args.branch === undefined) return { ...args, branch: unresolved };
+
+  console.warn(
+    `Unrecognized argument: ${unresolved}. Please explicitly specify argument name`
+  );
+
+  return args;
+}
+
+/** Apply default arguments */
+const applyDefaults = (parsed: Arguments): Arguments => ({
+  ...parsed,
+  remote: parsed.remote ?? getRemotes()[0],
+  branch: parsed.branch ?? getCurrentBranch(),
+  file: parsed.file ?? './',
+  dry: parsed.dry ?? 'false',
+});
+
+/**
+ * Could end branch name with "." or start it with "." and let the system
+ * automatically resolve the rest
+ */
+function resolveBranch(branch: string | undefined): string | undefined {
+  if (
+    branch === undefined ||
+    (!branch.startsWith('.') && !branch.endsWith('.'))
+  )
+    return branch;
+  const branches = getBranches();
+  const matches = branches.filter(
+    (possibleBranch) =>
+      (branch.startsWith('.') && possibleBranch.endsWith(branch.slice(1))) ||
+      (branch.endsWith('.') && possibleBranch.startsWith(branch.slice(0, -1)))
+  );
+
+  if (matches.length > 1)
+    console.warn(
+      `More than one branch matched the pattern: ${matches.join(', ')}`
+    );
+
+  return matches[0] ?? branch;
+}
