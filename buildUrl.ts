@@ -23,9 +23,13 @@ export function buildUrl({ remote, branch, file = './' }: Arguments): string {
 
   /*
    * If it's a directory, "tree" should be used instead of "blob", but GitHub
-   * takes care of redirect so don't need to worry about that
+   * takes care of redirect so don't need to worry about that.
+   *
+   * However, GitHub does not redirect the base path
    */
-  return `${baseUrl}blob/${branch}/${relativePath}`;
+  const mode = relativePath === '' ? 'tree' : 'blob';
+
+  return `${baseUrl}${mode}/${branch}/${relativePath}`;
 }
 
 /** Remove ".git", add "/" and resolve SSH url */
