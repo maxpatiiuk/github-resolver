@@ -29,7 +29,9 @@ export function buildUrl({ remote, branch, file = './' }: Arguments): string {
    */
   const mode = relativePath === '' ? 'tree' : 'blob';
 
-  return `${baseUrl}${mode}/${branch}/${relativePath}`;
+  return `${baseUrl}${mode}/${encodeURIComponent(branch)}/${encodeURIComponent(
+    relativePath
+  )}`;
 }
 
 /** Remove ".git", add "/" and resolve SSH url */
