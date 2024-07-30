@@ -1,6 +1,6 @@
 {
   /* File Inclusion */
-  "include": ["**/*.ts"],
+  "include": ["src"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     /* Basic Options */
@@ -20,7 +20,7 @@
     ],
     "module": "esnext",
     "noEmit": false,
-    "outDir": "./dist/",
+    "outDir": "dist",
     "sourceMap": false,
     "target": "esnext",
     "allowJs": false,

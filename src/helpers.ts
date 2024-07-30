@@ -19,7 +19,7 @@ export const getBranches = (): RA<string> =>
         const split = branch.split('/');
         return split[0] === 'remotes' ? split.slice(2).join('/') : branch;
       })
-      .filter((branch) => branch !== 'HEAD')
+      .filter((branch) => branch !== 'HEAD'),
   );
 
 export const getCurrentBranch = (): string =>

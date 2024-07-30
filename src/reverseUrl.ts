@@ -9,7 +9,7 @@ const reGitHubUrl =
 
 export function reverseUrl(
   partialUrl: string,
-  currentPath = process.cwd()
+  currentPath = process.cwd(),
 ): string | undefined {
   const url = new URL(partialUrl, 'https://github.com/').pathname;
   const parsed = reGitHubUrl.exec(url)?.groups;

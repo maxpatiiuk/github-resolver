@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 
 import { getBranches, getCurrentBranch, getRemotes } from './helpers.js';
+import { basename, dirname, join } from 'node:path';
 
 const booleanDefinitions = ['dry'];
 const valuedDefinitions = [
@@ -22,7 +23,7 @@ export type Arguments = Readonly<MutableArguments>;
  */
 export function parseArguments(args = process.argv.slice(2)): Arguments {
   const values: MutableArguments = Object.fromEntries(
-    valuedDefinitions.map((key) => [key, undefined])
+    valuedDefinitions.map((key) => [key, undefined]),
   );
   const unresolved: WritableArray<string> = [];
   let pendingArgument: Argument | undefined = undefined;
@@ -86,7 +87,7 @@ function resolveArgument(args: Arguments, unresolved: string): Arguments {
   if (
     args.url === undefined &&
     ['https://', 'http://', 'www.', 'github.com'].some((part) =>
-      lower.startsWith(part)
+      lower.startsWith(part),
     )
   )
     return { ...args, url: unresolved };
@@ -94,6 +95,30 @@ function resolveArgument(args: Arguments, unresolved: string): Arguments {
   // Check if arguments matches a file that exists
   if (args.file === undefined && fs.existsSync(unresolved))
     return { ...args, file: unresolved };
+
+  /*
+   * If given a path to a file without extension, try to auto-complete it. This
+   * can happen if directory contains multiple files with the same extension
+   * (i.e .tsx and .css). In that case, auto-complete in shell may leave out
+   * part of the file name
+   */
+  if (args.file === undefined && fs.existsSync(dirname(unresolved))) {
+    const dir = dirname(unresolved);
+    const base = basename(unresolved);
+    const files = fs.readdirSync(dir);
+    const filtered = files.filter((file) => file.startsWith(base));
+    const withPriorities = filtered.map((file) => {
+      const extension = file.split('.').pop();
+      const priority =
+        (extension ? fileExtensionPriorities.indexOf(extension) : undefined) ??
+        Number.POSITIVE_INFINITY;
+      return [file, priority] as const;
+    });
+    const sorted = withPriorities
+      .sort((a, b) => b[1] - a[1])
+      .map(([file]) => file);
+    if (sorted[0]) return { ...args, file: join(dir,sorted[0]) };
+  }
 
   // Check if argument matches a branch
   if (args.branch === undefined) {
@@ -119,7 +144,7 @@ function resolveArgument(args: Arguments, unresolved: string): Arguments {
   if (args.branch === undefined) return { ...args, branch: unresolved };
 
   console.warn(
-    `Unrecognized argument: ${unresolved}. Please explicitly specify argument name`
+    `Unrecognized argument: ${unresolved}. Please explicitly specify argument name`,
   );
 
   return args;
@@ -148,13 +173,44 @@ function resolveBranch(branch: string | undefined): string | undefined {
   const matches = branches.filter(
     (possibleBranch) =>
       (branch.startsWith('.') && possibleBranch.endsWith(branch.slice(1))) ||
-      (branch.endsWith('.') && possibleBranch.startsWith(branch.slice(0, -1)))
+      (branch.endsWith('.') && possibleBranch.startsWith(branch.slice(0, -1))),
   );
 
   if (matches.length > 1)
     console.warn(
-      `More than one branch matched the pattern: ${matches.join(', ')}`
+      `More than one branch matched the pattern: ${matches.join(', ')}`,
     );
 
   return matches[0] ?? branch;
 }
+
+/**
+ * If there are multiple files by the same name that match the given extension,
+ * use the file extension to find the "most interesting" file
+ */
+const fileExtensionPriorities = [
+  'tsx',
+  'ts',
+  'mts',
+  'cts',
+  'md',
+  'json',
+  'csv',
+  'tsv',
+  'xml',
+  'yaml',
+  'yml',
+  'html',
+  'css',
+  'py',
+  'sh',
+  'txt',
+  'mjs',
+  'cjs',
+  'jsx',
+  /*
+   * In some projects, transpiled .ts files are output into same directory as
+   * .js files. That is why these should be far lower priority than .ts
+   */
+  'js',
+];
