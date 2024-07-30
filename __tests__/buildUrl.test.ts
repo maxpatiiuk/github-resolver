@@ -1,4 +1,4 @@
-import { buildUrl } from '../buildUrl.js';
+import { buildUrl } from '../src/buildUrl.js';
 
 describe('buildUrl', () => {
   test('Simple case', () =>

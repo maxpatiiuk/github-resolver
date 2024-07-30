@@ -1,5 +1,5 @@
-import type { Arguments } from '../arguments.js';
-import { parseArguments } from '../arguments.js';
+import type { Arguments } from '../src/arguments.js';
+import { parseArguments } from '../src/arguments.js';
 
 const runs: IR<Arguments & { readonly warning?: string }> = {
   '': {
