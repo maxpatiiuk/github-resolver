@@ -114,10 +114,9 @@ function resolveArgument(args: Arguments, unresolved: string): Arguments {
         Number.POSITIVE_INFINITY;
       return [file, priority] as const;
     });
-    const sorted = withPriorities
-      .sort((a, b) => b[1] - a[1])
-      .map(([file]) => file);
-    if (sorted[0]) return { ...args, file: join(dir,sorted[0]) };
+    const sorted = withPriorities.sort((a, b) => b[1] - a[1]);
+    const final = sorted[0]?.[0];
+    if (final) return { ...args, file: join(dir, final) };
   }
 
   // Check if argument matches a branch

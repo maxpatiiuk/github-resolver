@@ -2,6 +2,7 @@ import path from 'node:path';
 
 import type { Arguments } from './arguments.js';
 import { getRemoteUrl, getRootDirectory } from './helpers.js';
+import { existsSync } from 'node:fs';
 
 /**
  * Construct a GitHub folder/file view url based on the path
@@ -17,9 +18,20 @@ export function buildUrl({ remote, branch, file = './' }: Arguments): string {
 
   const baseUrl = resolveRemoteUrl(getRemoteUrl(remote));
 
-  const gitDirectory = getRootDirectory();
-  const resolvedPath = path.resolve(file);
-  const relativePath = path.relative(gitDirectory, resolvedPath);
+  const rootDirectory = getRootDirectory();
+
+  let resolvedPath = path.resolve(file);
+
+  // If provided path is relative to root directory, resolve it correctly
+  if (
+    process.cwd() !== rootDirectory &&
+    !existsSync(file) &&
+    existsSync(path.join(rootDirectory, file))
+  ) {
+    resolvedPath = path.join(rootDirectory, file);
+  }
+
+  const relativePath = path.relative(rootDirectory, resolvedPath);
 
   /*
    * If it's a directory, "tree" should be used instead of "blob", but GitHub
