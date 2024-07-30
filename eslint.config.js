@@ -5,7 +5,7 @@ export default [
   ...eslintConfig,
   {
     languageOptions: {
-      sourceType: "module",
+      sourceType: 'module',
       parserOptions: {
         project: './tsconfig.json',
       },
@@ -19,6 +19,6 @@ export default [
       'unicorn/expiring-todo-comments': 'off',
       // This rule is only useful in OOP codebases
       '@typescript-eslint/unbound-method': 'off',
-    }
+    },
   },
 ];

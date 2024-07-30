@@ -10,12 +10,12 @@ module.exports = {
   env: {
     test: {
       presets: [
-        ['@babel/preset-env', {targets: {node: 'current'}}],
+        ['@babel/preset-env', { targets: { node: 'current' } }],
         ['@babel/preset-react'],
         ['@babel/preset-typescript'],
       ],
       plugins: [
-        ["replace-import-extension", { "extMapping": { ".js": "" }}],
+        ['replace-import-extension', { extMapping: { '.js': '' } }],
         '@babel/plugin-transform-modules-commonjs',
       ],
     },

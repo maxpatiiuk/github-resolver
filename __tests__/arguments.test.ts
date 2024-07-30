@@ -85,6 +85,6 @@ describe('parseArguments', () => {
       expect(parseArguments(args.split(' ').filter(Boolean))).toEqual(result);
 
       expect(warnings).toEqual([warning].filter(Boolean));
-    })
+    }),
   );
 });

@@ -25,6 +25,6 @@ describe('getRemoteUrl', () => {
 
   test('SSH URL', () =>
     expect(getRemoteUrl('origin2')).toBe(
-      'git@github.example.com:organization/repository.git'
+      'git@github.example.com:organization/repository.git',
     ));
 });

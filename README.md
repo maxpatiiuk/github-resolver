@@ -19,8 +19,8 @@ Install dependencies:
 npm install
 ```
 
-Add this to your shell init file. Change the "dir" variable to the directory
-in which this repository is located.
+Add this to your shell init file. Change the "dir" variable to the directory in
+which this repository is located.
 
 ```sh
 g() {
@@ -103,6 +103,7 @@ g https://github.com/specify/specify7/blob/production/README.md
 ```
 
 You can customize the used editor by setting an `EDITOR` environment variable:
+
 ```sh
 # In the init file:
 export EDITOR="vim"
