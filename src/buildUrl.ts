@@ -7,7 +7,12 @@ import { existsSync } from 'node:fs';
 /**
  * Construct a GitHub folder/file view url based on the path
  */
-export function buildUrl({ remote, branch, file = './' }: Arguments): string {
+export function buildUrl({
+  remote,
+  branch,
+  file = './',
+  line,
+}: Arguments): string {
   if (remote === undefined)
     // eslint-disable-next-line functional/no-throw-statement
     throw new Error('No remote is found in the repository');
@@ -31,6 +36,8 @@ export function buildUrl({ remote, branch, file = './' }: Arguments): string {
     resolvedPath = path.join(rootDirectory, file);
   }
 
+  const lineNumber = line === undefined ? '' : `#L${line}`;
+
   const relativePath = path.relative(rootDirectory, resolvedPath);
 
   /*
@@ -41,10 +48,15 @@ export function buildUrl({ remote, branch, file = './' }: Arguments): string {
    */
   const mode = relativePath === '' ? 'tree' : 'blob';
 
-  return `${baseUrl}${mode}/${encodeURIComponent(branch)}/${relativePath
-    .split('/')
-    .map(encodeURIComponent)
-    .join('/')}`;
+  return [
+    baseUrl,
+    mode,
+    '/',
+    encodeURIComponent(branch),
+    '/',
+    relativePath.split('/').map(encodeURIComponent).join('/'),
+    lineNumber,
+  ].join('');
 }
 
 /** Remove ".git", add "/" and resolve SSH url */

@@ -3,14 +3,15 @@ import fs from 'node:fs';
 import { getBranches, getCurrentBranch, getRemotes } from './helpers.js';
 import { basename, dirname, join } from 'node:path';
 
-const booleanDefinitions = ['dry'];
+const booleanDefinitions = ['dry'] as const;
 const valuedDefinitions = [
   'file',
   'branch',
   'remote',
   'url',
+  'line',
   ...booleanDefinitions,
-];
+] as const;
 type Argument = ItemOf<typeof valuedDefinitions>;
 type MutableArguments = Record<Argument, string | undefined>;
 export type Arguments = Readonly<MutableArguments>;
@@ -22,16 +23,18 @@ export type Arguments = Readonly<MutableArguments>;
  * to figure out which argument is what)
  */
 export function parseArguments(args = process.argv.slice(2)): Arguments {
-  const values: MutableArguments = Object.fromEntries(
+  const values = Object.fromEntries(
     valuedDefinitions.map((key) => [key, undefined]),
-  );
+  ) as MutableArguments;
   const unresolved: WritableArray<string> = [];
   let pendingArgument: Argument | undefined = undefined;
   args.forEach((argument) => {
     if (argument.startsWith('-')) {
       if (
         typeof pendingArgument === 'string' &&
-        booleanDefinitions.includes(pendingArgument)
+        booleanDefinitions.includes(
+          pendingArgument as (typeof booleanDefinitions)[number],
+        )
       )
         values[pendingArgument] = 'true';
 
@@ -39,7 +42,12 @@ export function parseArguments(args = process.argv.slice(2)): Arguments {
       const resolved = resolve(parsed);
 
       if (typeof resolved === 'string') {
-        if (booleanDefinitions.includes(resolved)) values[resolved] = 'true';
+        if (
+          booleanDefinitions.includes(
+            resolved as (typeof booleanDefinitions)[number],
+          )
+        )
+          values[resolved] = 'true';
         else pendingArgument = resolved;
         return;
       }
@@ -95,6 +103,17 @@ function resolveArgument(args: Arguments, unresolved: string): Arguments {
   // Check if arguments matches a file that exists
   if (args.file === undefined && fs.existsSync(unresolved))
     return { ...args, file: unresolved };
+
+  const withPosition = unresolved.match(reFilePosition);
+  if (args.file === undefined && withPosition !== null) {
+    const file = unresolved.slice(0, withPosition.index);
+    if (fs.existsSync(file))
+      return {
+        ...args,
+        file: file,
+        line: withPosition.groups!.line,
+      };
+  }
 
   /*
    * If given a path to a file without extension, try to auto-complete it. This
@@ -182,6 +201,8 @@ function resolveBranch(branch: string | undefined): string | undefined {
 
   return matches[0] ?? branch;
 }
+
+const reFilePosition = /:(?<line>\d+)(?::\d+)?/u;
 
 /**
  * If there are multiple files by the same name that match the given extension,
