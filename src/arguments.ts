@@ -143,6 +143,14 @@ function resolveArgument(args: Arguments, unresolved: string): Arguments {
     const branches = getBranches();
     const branch = branches.find((branch) => branch.toLowerCase() === lower);
     if (typeof branch === 'string') return { ...args, branch };
+    else if (unresolved.includes('/')) {
+      const remotes = getRemotes();
+      const remoteName = unresolved.split('/')[0];
+      if (remotes.includes(remoteName)) {
+        const branch = unresolved.slice(remoteName.length + '/'.length);
+        return { ...args, branch, remote: remoteName };
+      }
+    }
     // See resolveBranch()
     else if (unresolved.endsWith('.')) return { ...args, branch: unresolved };
   }
