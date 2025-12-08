@@ -24,7 +24,7 @@ which this repository is located.
 
 ```sh
 g() {
-  local dir=~/site/javascript/github-resolver
+  local dir=~/s/javascript/github-resolver
   local output=$(node "${dir}/dist/main.js" $@)
   if [[ "${output}" =~ "^cd " ]]; then
     eval ${output}
@@ -32,7 +32,6 @@ g() {
     echo "${output}"
   fi
 }
-
 ```
 
 ## Open current directory in GitHub
