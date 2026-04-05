@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -6,7 +7,23 @@ import { unique } from './utils.js';
 const exec = (command: string): RA<string> =>
   execSync(command).toString().trim().split('\n').filter(Boolean);
 
-export const getGitDirectory = (): string => exec('git rev-parse --git-dir')[0];
+const removeRemoteName = (branch: string): string =>
+  branch.split('/').slice(1).join('/') || branch;
+
+export const getGitDirectory = (): string => {
+  let currentDirectory = process.cwd();
+
+  while (true) {
+    const gitPath = path.join(currentDirectory, '.git');
+    if (existsSync(gitPath)) return gitPath;
+
+    const parentDirectory = path.dirname(currentDirectory);
+    if (parentDirectory === currentDirectory) break;
+    currentDirectory = parentDirectory;
+  }
+
+  throw Error('Not in a git repository');
+};
 
 export const getRootDirectory = (): string => path.dirname(getGitDirectory());
 
@@ -22,8 +39,16 @@ export const getBranches = (): RA<string> =>
       .filter((branch) => branch !== 'HEAD'),
   );
 
-export const getCurrentBranch = (): string =>
-  exec('git branch --show-current')[0];
+export const getCurrentBranch = (): string => {
+  const localBranch = exec('git branch --show-current')[0];
+  const upstreamBranch = exec(
+    `git for-each-ref --format='%(upstream:short)' refs/heads/${localBranch}`,
+  )[0];
+
+  return typeof upstreamBranch === 'string'
+    ? removeRemoteName(upstreamBranch)
+    : localBranch;
+};
 
 export const getRemotes = (): RA<string> => exec('git remote');
 

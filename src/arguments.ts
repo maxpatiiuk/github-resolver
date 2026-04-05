@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import { getBranches, getCurrentBranch, getRemotes } from './helpers.js';
 import { basename, dirname, join } from 'node:path';
 
-const booleanDefinitions = ['dry'] as const;
+const booleanDefinitions = ['dry', 'pr'] as const;
 const valuedDefinitions = [
   'file',
   'branch',
@@ -183,6 +183,7 @@ const applyDefaults = (parsed: Arguments): Arguments => ({
   branch: parsed.branch ?? getCurrentBranch(),
   file: parsed.file ?? './',
   dry: parsed.dry ?? 'false',
+  pr: parsed.pr ?? 'false',
 });
 
 /**

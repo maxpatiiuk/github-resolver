@@ -12,16 +12,23 @@ export function buildUrl({
   branch,
   file = './',
   line,
+  pr,
 }: Arguments): string {
   if (remote === undefined)
     // eslint-disable-next-line functional/no-throw-statement
     throw new Error('No remote is found in the repository');
 
-  if (branch === undefined)
+  if (pr !== 'true' && branch === undefined)
     // eslint-disable-next-line functional/no-throw-statement
     throw new Error('No branches found in this repository');
 
   const baseUrl = resolveRemoteUrl(getRemoteUrl(remote));
+
+  if (pr === 'true') return `${baseUrl}pulls`;
+
+  if (branch === undefined)
+    // eslint-disable-next-line functional/no-throw-statement
+    throw Error('No branches found in this repository');
 
   const rootDirectory = getRootDirectory();
 

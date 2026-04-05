@@ -1,6 +1,11 @@
 import { buildUrl } from '../src/buildUrl.js';
 
 describe('buildUrl', () => {
+  test('Pull requests page', () =>
+    expect(buildUrl({ remote: 'origin', pr: 'true' })).toBe(
+      'https://github.com/specify/specify7/pulls',
+    ));
+
   test('Simple case', () =>
     expect(buildUrl({ remote: 'origin', branch: 'main', file: './' })).toBe(
       'https://github.com/specify/specify7/tree/main/',

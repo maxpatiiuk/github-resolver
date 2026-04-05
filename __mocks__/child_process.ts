@@ -13,6 +13,7 @@ const mocks: RA<
   readonly [matcher: (command: string) => boolean, output: string]
 > = [
   [(command) => command.includes('show-current'), 'main'],
+  [(command) => command.includes('for-each-ref'), ''],
   [
     (command) => command.includes('branch'),
     '* main\n  remotes/origin/pass -> pass\npass2\npass2',
