@@ -23,7 +23,7 @@ Add this to your shell init file. Change the "dir" variable to the directory in
 which this repository is located.
 
 ```sh
-g() {
+gu() {
   local dir=~/s/javascript/github-resolver
   local output=$(node "${dir}/dist/main.js" $@)
   if [[ "${output}" =~ "^cd " ]]; then
@@ -40,33 +40,36 @@ Open your terminal to any directory inside a clonned repository. Then:
 
 ```sh
 # Open current folder on current branch in GitHub
-g
+gu
 
 # Open ./main.js on current branch in GitHub
 # All of these varians do the same thing. Pick whichever you like:
-g main.js
-g ./main.js
-g --file ./main.js
-g --file=./main.js
-g -f./main.js
+gu main.js
+gu ./main.js
+gu --file ./main.js
+gu --file=./main.js
+gu -f./main.js
 
 # Open ../main.js on production in GitHub
-g ../main.js production
-g production ../main.js
-g --branch=production --file=../main.js
-g -b=production -f ../main.js
+gu ../main.js production
+gu production ../main.js
+gu --branch=production --file=../main.js
+gu -b=production -f ../main.js
 
 # Open current folder on the production branch on the URL configuered for git remote "origin2"
-g production origin2
-g --branch production --remote origin2
-g origin2 production
+gu production origin2
+gu --branch production --remote origin2
+gu origin2 production
+
+# Open the repository pull requests page
+gu --pr
 
 # By adding "--dry", you can output the web url, but don't open it
-g ./main.js --dry
+gu ./main.js --dry
 # Could even write it to file:
-g ./main.js --dry > url.txt
+gu ./main.js --dry > url.txt
 # Or pass to a different program:
-g ./main.js --dry | less
+gu ./main.js --dry | less
 ```
 
 ## Open GitHub Webpage in terminal
@@ -78,7 +81,7 @@ Before running the script, `cd` to correct repository.
 For example, this will navigate to the root directory of current repository:
 
 ```sh
-g https://github.com/specify/specify7/tree/production/
+gu https://github.com/specify/specify7/tree/production/
 ```
 
 Besides navigation, it would also list files in that directory using `ls`
@@ -92,13 +95,13 @@ For example:
 export LIST_FILES="ls -ahl"
 
 # Later:
-g https://github.com/specify/specify7/tree/production/
+gu https://github.com/specify/specify7/tree/production/
 ```
 
 And this will open the `README.md` file in your editor:
 
 ```sh
-g https://github.com/specify/specify7/blob/production/README.md
+gu https://github.com/specify/specify7/blob/production/README.md
 ```
 
 You can customize the used editor by setting an `EDITOR` environment variable:
@@ -108,7 +111,7 @@ You can customize the used editor by setting an `EDITOR` environment variable:
 export EDITOR="vim"
 
 # Later:
-g https://github.com/specify/specify7/tree/production/
+gu https://github.com/specify/specify7/tree/production/
 ```
 
 By default it would use system's default editor associated with the file
