@@ -1,51 +1,21 @@
 {
-  /* File Inclusion */
-  "include": ["src"],
-  "exclude": ["node_modules"],
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "include": ["src", "__tests__", "__mocks__", "vite.config.ts"],
   "compilerOptions": {
-    /* Basic Options */
-    "isolatedModules": true,
-    "lib": [
-      "es6",
-      "dom",
-      "dom.iterable",
-      "es2015",
-      "es2016",
-      "es2017",
-      "es2018",
-      "es2019",
-      "es2020",
-      "es2021",
-      "esnext"
-    ],
-    "module": "esnext",
-    "noEmit": false,
-    "outDir": "dist",
-    "sourceMap": false,
-    "target": "esnext",
-    "allowJs": false,
-    "checkJs": false,
-    /**/
-    /* Strict Checks */
-    "strict": true,
-    /**/
-    /* Module Resolution */
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    /**/
-    /* Linter Checks */
+    "allowUnreachableCode": false,
+    "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    /**/
-    /* Advanced */
-    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
+    "noEmit": true,
+    "verbatimModuleSyntax": true,
+    "lib": ["esnext"],
+    "types": ["node"],
     "skipLibCheck": true
-    /* Projects */
-    // REFACTOR: test performance improvements of enabling this:
-    //    "composite": true
-  },
-  "noPropertyAccessFromIndexSignature": true
+  }
 }

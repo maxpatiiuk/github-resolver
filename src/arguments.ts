@@ -18,7 +18,7 @@ const valuedDefinitions = [
   ...booleanDefinitions,
 ] as const;
 type Argument = ItemOf<typeof valuedDefinitions>;
-type MutableArguments = Record<Argument, string | undefined>;
+type MutableArguments = Partial<Record<Argument, string>>;
 export type Arguments = Readonly<MutableArguments>;
 
 /**

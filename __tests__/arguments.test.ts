@@ -1,3 +1,5 @@
+import { describe, expect, test, vi } from 'vitest';
+
 import type { Arguments } from '../src/arguments.js';
 import { parseArguments } from '../src/arguments.js';
 
@@ -97,8 +99,8 @@ describe('parseArguments', () => {
   Object.entries(runs).forEach(([args, { warning = '', ...result }]) =>
     test(args || 'empty case', () => {
       const warnings: WritableArray<unknown> = [];
-      const consoleWarn = jest.fn((...args) => warnings.push(args[0]));
-      jest.spyOn(console, 'warn').mockImplementation(consoleWarn);
+      const consoleWarn = vi.fn((...args) => warnings.push(args[0]));
+      vi.spyOn(console, 'warn').mockImplementation(consoleWarn);
 
       expect(parseArguments(args.split(' ').filter(Boolean))).toEqual(result);
 

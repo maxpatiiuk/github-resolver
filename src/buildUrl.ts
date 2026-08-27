@@ -16,11 +16,9 @@ export function buildUrl({
   pr,
 }: Arguments): string {
   if (remote === undefined)
-    // eslint-disable-next-line functional/no-throw-statement
     throw new Error('No remote is found in the repository');
 
   if (pr !== 'true' && branch === undefined)
-    // eslint-disable-next-line functional/no-throw-statement
     throw new Error('No branches found in this repository');
 
   const baseUrl = resolveRemoteUrl(getRemoteUrl(remote));
@@ -28,9 +26,7 @@ export function buildUrl({
   if (pr === 'true')
     return resolvePullRequestUrl(baseUrl, branch) ?? `${baseUrl}pulls`;
 
-  if (branch === undefined)
-    // eslint-disable-next-line functional/no-throw-statement
-    throw Error('No branches found in this repository');
+  if (branch === undefined) throw Error('No branches found in this repository');
 
   const rootDirectory = getRootDirectory();
 
@@ -79,7 +75,17 @@ function resolvePullRequestUrl(
     const repository = `${remote.host}${remote.pathname}`.replace(/\/$/u, '');
     const url = execFileSync(
       'gh',
-      ['pr', 'view', branch, '--repo', repository, '--json', 'url', '--jq', '.url'],
+      [
+        'pr',
+        'view',
+        branch,
+        '--repo',
+        repository,
+        '--json',
+        'url',
+        '--jq',
+        '.url',
+      ],
       { encoding: 'utf8' },
     ).trim();
     return url || undefined;

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { describe, expect, test } from 'vitest';
 
 import { reverseUrl } from '../src/reverseUrl.js';
 

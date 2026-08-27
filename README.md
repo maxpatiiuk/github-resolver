@@ -11,11 +11,11 @@ It can also do the reverse: given a github URL, open that file locally
 
 ## Installation
 
-Node.js 16+ is required
+Node.js 24+ is required
 
 Install dependencies:
 
-```
+```sh
 npm install
 ```
 

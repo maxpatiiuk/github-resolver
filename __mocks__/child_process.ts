@@ -1,9 +1,11 @@
-jest.mock('node:child_process', () => ({
-  ...jest.requireActual('node:child_process'),
-  execFileSync: jest.fn(() => {
+import { vi } from 'vitest';
+
+vi.mock('node:child_process', async () => ({
+  ...(await vi.importActual('node:child_process')),
+  execFileSync: vi.fn(() => {
     throw new Error('gh command failed');
   }),
-  execSync: jest.fn((command: string) => {
+  execSync: vi.fn((command: string) => {
     const mock = mocks.find(([matcher]) => matcher(command))?.[1];
     if (mock === undefined)
       throw new Error(`Unmocked execSync call: ${command}`);
@@ -11,7 +13,6 @@ jest.mock('node:child_process', () => ({
   }),
 }));
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 const mocks: RA<
   readonly [matcher: (command: string) => boolean, output: string]
 > = [
@@ -32,6 +33,3 @@ const mocks: RA<
     'https://github.com/specify/specify7',
   ],
 ];
-/* eslint-enable @typescript-eslint/explicit-function-return-type */
-
-export {};

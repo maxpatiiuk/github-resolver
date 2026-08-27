@@ -1,24 +1,29 @@
-import eslintConfig from '@maxxxxxdlp/eslint-config';
-import globals from 'globals';
+import { globalIgnores } from 'eslint/config';
+import eslintConfig from '@arcgis/eslint-config';
 
 export default [
+  globalIgnores(['node_modules/', 'dist/', 'coverage/']),
   ...eslintConfig,
   {
+    files: ['**/*.ts'],
     languageOptions: {
-      sourceType: 'module',
       parserOptions: {
-        project: './tsconfig.json',
-      },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
-      // This rule crashes
-      'unicorn/expiring-todo-comments': 'off',
-      // This rule is only useful in OOP codebases
-      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/naming-convention': 'warn',
+      '@typescript-eslint/no-unnecessary-condition': 'warn',
+      '@typescript-eslint/explicit-function-return-type': [
+        'warn',
+        { allowExpressions: true },
+      ],
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-call': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
     },
   },
+  { files: ['**/*.md'], rules: { 'markdown/require-alt-text': 'off' } },
 ];

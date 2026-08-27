@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { describe, expect, test, vi } from 'vitest';
+
 import {
   getBranches,
   getCurrentBranch,
@@ -36,7 +38,7 @@ test('getGitDirectory finds nearest parent .git directory', () => {
     fs.mkdirSync(gitDirectory, { recursive: true });
     fs.mkdirSync(nestedDirectory, { recursive: true });
 
-    const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(nestedDirectory);
+    const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(nestedDirectory);
 
     try {
       expect(getGitDirectory()).toBe(gitDirectory);
@@ -56,7 +58,7 @@ test('getGitDirectory handles worktree .git file', () => {
     fs.mkdirSync(nestedDirectory, { recursive: true });
     fs.writeFileSync(gitFile, 'gitdir: /tmp/main/.git/worktrees/app\n');
 
-    const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(nestedDirectory);
+    const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(nestedDirectory);
 
     try {
       expect(getGitDirectory()).toBe(gitFile);
@@ -76,7 +78,7 @@ test('getCurrentBranch falls back to local branch', () =>
   expect(getCurrentBranch()).toBe('main'));
 
 test('getCurrentBranch prefers tracked remote branch name', () => {
-  const execSyncMock = jest.mocked(execSync);
+  const execSyncMock = vi.mocked(execSync);
   execSyncMock
     .mockImplementationOnce(() => 'feature/local')
     .mockImplementationOnce(() => 'origin/feature/remote');
@@ -87,7 +89,7 @@ test('getCurrentBranch prefers tracked remote branch name', () => {
 test('getRemotes', () => expect(getRemotes()).toEqual(['origin', 'origin2']));
 
 describe('getDefaultRemote', () => {
-  const execSyncMock = jest.mocked(execSync);
+  const execSyncMock = vi.mocked(execSync);
 
   test('uses the only remote', () => {
     execSyncMock.mockImplementationOnce(() => 'fork');

@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { describe, expect, test, vi } from 'vitest';
 
 import { buildUrl } from '../src/buildUrl.js';
 
@@ -9,9 +10,9 @@ describe('buildUrl', () => {
     ));
 
   test('Pull request for the branch', () => {
-    jest
-      .mocked(execFileSync)
-      .mockReturnValueOnce('https://github.com/specify/specify7/pull/123\n');
+    vi.mocked(execFileSync).mockReturnValueOnce(
+      'https://github.com/specify/specify7/pull/123\n',
+    );
 
     expect(buildUrl({ remote: 'origin', branch: 'feature', pr: 'true' })).toBe(
       'https://github.com/specify/specify7/pull/123',

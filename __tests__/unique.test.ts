@@ -1,3 +1,5 @@
+import { describe, expect, test } from 'vitest';
+
 import { unique } from '../src/utils.js';
 
 describe('unique', () => {
