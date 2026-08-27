@@ -52,5 +52,27 @@ export const getCurrentBranch = (): string => {
 
 export const getRemotes = (): RA<string> => exec('git remote');
 
+export const getDefaultRemote = (branch?: string): string | undefined => {
+  const remotes = getRemotes();
+  if (remotes.length <= 1) return remotes[0];
+
+  const localBranch = branch ?? exec('git branch --show-current')[0];
+  const upstreamRemote =
+    localBranch === undefined
+      ? undefined
+      : exec(
+          `git for-each-ref --format='%(upstream:remotename)' refs/heads/${localBranch}`,
+        )[0];
+
+  if (
+    upstreamRemote !== undefined &&
+    upstreamRemote !== '.' &&
+    remotes.includes(upstreamRemote)
+  )
+    return upstreamRemote;
+
+  return remotes.includes('origin') ? 'origin' : remotes[0];
+};
+
 export const getRemoteUrl = (remote: string): string =>
   exec(`git remote get-url ${remote}`)[0];

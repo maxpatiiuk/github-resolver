@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 
-import { getBranches, getCurrentBranch, getRemotes } from './helpers.js';
+import {
+  getBranches,
+  getCurrentBranch,
+  getDefaultRemote,
+  getRemotes,
+} from './helpers.js';
 import { basename, dirname, join } from 'node:path';
 
 const booleanDefinitions = ['dry', 'pr'] as const;
@@ -179,7 +184,7 @@ function resolveArgument(args: Arguments, unresolved: string): Arguments {
 /** Apply default arguments */
 const applyDefaults = (parsed: Arguments): Arguments => ({
   ...parsed,
-  remote: parsed.remote ?? getRemotes()[0],
+  remote: parsed.remote ?? getDefaultRemote(parsed.branch),
   branch: parsed.branch ?? getCurrentBranch(),
   file: parsed.file ?? './',
   dry: parsed.dry ?? 'false',

@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   getBranches,
   getCurrentBranch,
+  getDefaultRemote,
   getGitDirectory,
   getRemotes,
   getRemoteUrl,
@@ -84,6 +85,49 @@ test('getCurrentBranch prefers tracked remote branch name', () => {
 });
 
 test('getRemotes', () => expect(getRemotes()).toEqual(['origin', 'origin2']));
+
+describe('getDefaultRemote', () => {
+  const execSyncMock = jest.mocked(execSync);
+
+  test('uses the only remote', () => {
+    execSyncMock.mockImplementationOnce(() => 'fork');
+
+    expect(getDefaultRemote('feature')).toBe('fork');
+  });
+
+  test('uses the branch upstream remote', () => {
+    execSyncMock
+      .mockImplementationOnce(() => 'fork\norigin')
+      .mockImplementationOnce(() => 'fork');
+
+    expect(getDefaultRemote('feature')).toBe('fork');
+  });
+
+  test('uses the current branch when no branch is provided', () => {
+    execSyncMock
+      .mockImplementationOnce(() => 'fork\norigin')
+      .mockImplementationOnce(() => 'feature')
+      .mockImplementationOnce(() => 'fork');
+
+    expect(getDefaultRemote()).toBe('fork');
+  });
+
+  test('falls back to origin', () => {
+    execSyncMock
+      .mockImplementationOnce(() => 'fork\norigin')
+      .mockImplementationOnce(() => '');
+
+    expect(getDefaultRemote('feature')).toBe('origin');
+  });
+
+  test('falls back to the first remote when origin is absent', () => {
+    execSyncMock
+      .mockImplementationOnce(() => 'alpha\nzeta')
+      .mockImplementationOnce(() => '');
+
+    expect(getDefaultRemote('feature')).toBe('alpha');
+  });
+});
 
 describe('getRemoteUrl', () => {
   test('URL', () =>
