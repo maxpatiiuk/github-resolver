@@ -1,10 +1,37 @@
+import { execFileSync } from 'node:child_process';
+
 import { buildUrl } from '../src/buildUrl.js';
 
 describe('buildUrl', () => {
-  test('Pull requests page', () =>
-    expect(buildUrl({ remote: 'origin', pr: 'true' })).toBe(
+  test('Pull requests page when the branch has no pull request', () =>
+    expect(buildUrl({ remote: 'origin', branch: 'main', pr: 'true' })).toBe(
       'https://github.com/specify/specify7/pulls',
     ));
+
+  test('Pull request for the branch', () => {
+    jest
+      .mocked(execFileSync)
+      .mockReturnValueOnce('https://github.com/specify/specify7/pull/123\n');
+
+    expect(buildUrl({ remote: 'origin', branch: 'feature', pr: 'true' })).toBe(
+      'https://github.com/specify/specify7/pull/123',
+    );
+    expect(execFileSync).toHaveBeenCalledWith(
+      'gh',
+      [
+        'pr',
+        'view',
+        'feature',
+        '--repo',
+        'github.com/specify/specify7',
+        '--json',
+        'url',
+        '--jq',
+        '.url',
+      ],
+      { encoding: 'utf8' },
+    );
+  });
 
   test('Simple case', () =>
     expect(buildUrl({ remote: 'origin', branch: 'main', file: './' })).toBe(

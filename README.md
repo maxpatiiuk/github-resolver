@@ -61,7 +61,9 @@ gu production origin2
 gu --branch production --remote origin2
 gu origin2 production
 
-# Open the repository pull requests page
+# Open the pull request for the current branch, if one exists.
+# Otherwise, open the repository pull requests page. Requires the GitHub CLI
+# (`gh`) to detect an existing pull request.
 gu --pr
 
 # By adding "--dry", you can output the web url, but don't open it

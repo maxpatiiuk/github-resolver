@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 import type { Arguments } from './arguments.js';
 import { getRemoteUrl, getRootDirectory } from './helpers.js';
@@ -24,7 +25,8 @@ export function buildUrl({
 
   const baseUrl = resolveRemoteUrl(getRemoteUrl(remote));
 
-  if (pr === 'true') return `${baseUrl}pulls`;
+  if (pr === 'true')
+    return resolvePullRequestUrl(baseUrl, branch) ?? `${baseUrl}pulls`;
 
   if (branch === undefined)
     // eslint-disable-next-line functional/no-throw-statement
@@ -64,6 +66,26 @@ export function buildUrl({
     relativePath.split('/').map(encodeURIComponent).join('/'),
     lineNumber,
   ].join('');
+}
+
+function resolvePullRequestUrl(
+  baseUrl: string,
+  branch: string | undefined,
+): string | undefined {
+  if (branch === undefined) return undefined;
+
+  try {
+    const remote = new URL(baseUrl);
+    const repository = `${remote.host}${remote.pathname}`.replace(/\/$/u, '');
+    const url = execFileSync(
+      'gh',
+      ['pr', 'view', branch, '--repo', repository, '--json', 'url', '--jq', '.url'],
+      { encoding: 'utf8' },
+    ).trim();
+    return url || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Remove ".git", add "/" and resolve SSH url */

@@ -1,5 +1,8 @@
 jest.mock('node:child_process', () => ({
   ...jest.requireActual('node:child_process'),
+  execFileSync: jest.fn(() => {
+    throw new Error('gh command failed');
+  }),
   execSync: jest.fn((command: string) => {
     const mock = mocks.find(([matcher]) => matcher(command))?.[1];
     if (mock === undefined)
